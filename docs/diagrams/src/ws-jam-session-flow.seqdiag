@@ -1,0 +1,28 @@
+# Or in VS Code:
+# https://marketplace.visualstudio.com/items?itemName=AleksandarDev.vscode-sequence-diagrams
+
+Note right of ClientA: GET /ws/v1/jam\nHTTP/1.1\\nUpgrade: websocket\nConnection: Upgrade
+ClientA->Server: Establish WebSocket connection
+
+Note left of Server: HTTP/1.1 101 Switching Protocols\nUpgrade: websocket\nConnection: Upgrade
+Server->ClientA: Upgrade to WebSocket
+
+Note right of ClientA: {"type":"LIST_JAMS","payload":{}}
+ClientA->Server: Send LIST_JAMS payload
+
+Note left of Server: { "jams": [\n{"id": "1","name": "Jam 1"},\n{"id": "2","name": "Jam 2"}\n] }
+Server->ClientA: Send LIST_JAMS response
+
+Note right of ClientA: {"type":"JAM_JOIN","payload":{"jamId":"1", "userId":"1234"}}
+ClientA->Server: Send JAM_JOIN payload
+
+Note over Server: Server adds user 1234 to jam 1,\nand broadcasts JAM_USER_JOIN response to all users in jam 1.
+
+Note over Server,ClientA: **Or:**\nClient can create a new jam session.
+
+Note right of ClientA: {"type":"JAM_CREATE",\n"payload":{"name: "Joints & Jams"\n"userId":"1234", "tempo":"74"}}
+ClientA->Server: Send JAM_CREATE payload
+
+Note over Server: Server creates a new jam session
+Note left of Server: { "id": "3",\n"name": "Joints & Jams",\n"tempo": "74",\n"users": [\n{"id": "1234",\n"name": "John Doe"}\n] }
+Server->ClientA: Send JAM_CREATE response

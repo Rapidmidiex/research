@@ -1,0 +1,37 @@
+note over ClientA, Server: **Lobby**
+Note over ClientA: GET /api/v1/jam
+ClientA->Server: Request all available Jam Sessions
+
+Note over Server: { "jams": [\n{"id": "1","name": "Jam 1"},\n{"id": "2","name": "Jam 2"}\n] }
+Server-->ClientA: Respond with Jam Sessions
+
+Note over ClientA: POST /api/v1/user\n{}
+ClientA->Server: Create a new user 
+
+Note over Server: { "userId": "xyz123", "name": "Some Generated Name" }
+Note over Server: Set-Cookie header (or JWT) with user info
+Server-->ClientA: Respond with new user info (header or JSON)
+
+note over ClientA, Server: **Create Jam Session**
+Note over ClientA: POST /api/v1/jam\n{"tempo": 85, "name":"Joints & Jams", "owner": "xyz123" ...}
+ClientA->Server: Create a new Jam Session
+
+note over Server: { "jamId": "abc123", ... }
+Server-->ClientA: Respond with 201 Create and Jam resource
+
+note over ClientA, Server: **Join a Session (Websocket)**
+Note over ClientA: GET /ws/abc123\nUpgrade
+ClientA->Server: Establish connection with "Joints & Jams" Jam
+Server-->ClientA: WS Handshake
+
+Note over Server: Server adds user "xyz123" to jam "abc123",\nand broadcasts JAM_USER_JOIN response to all users in "abc123".
+
+Note over ClientB, Server: **Another user joins**\nThey have already gone through flow to obtain a userId, "qwe456".
+
+note over ClientB, Server: Join a Session (Websocket)
+Note over ClientB: GET /ws/abc123\nUpgrade
+ClientB->Server: Establish connection with "Joints & Jams" Jam
+Server-->ClientB: WS Handshake
+
+Note over Server: Server adds user "qwe456" to jam "abc123"1,\nand broadcasts JAM_USER_JOIN response to all users in "abc123".
+
